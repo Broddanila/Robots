@@ -3,6 +3,8 @@ package gui;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -18,19 +20,11 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import log.Logger;
 
-/**
- * Что требуется сделать:
- * 1. Метод создания меню перегружен функционалом и трудно читается. 
- * Следует разделить его на серию более простых методов (или вообще выделить отдельный класс).
- *
- */
 public class MainApplicationFrame extends JFrame
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
     
     public MainApplicationFrame() {
-        //Make the big window be indented 50 pixels from each edge
-        //of the screen.
         int inset = 50;        
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setBounds(inset, inset,
@@ -38,7 +32,6 @@ public class MainApplicationFrame extends JFrame
             screenSize.height - inset*2);
 
         setContentPane(desktopPane);
-        
         
         LogWindow logWindow = createLogWindow();
         addWindow(logWindow);
@@ -48,7 +41,15 @@ public class MainApplicationFrame extends JFrame
         addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+                
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                exitApplication();
+            }
+        });
     }
     
     protected LogWindow createLogWindow()
@@ -76,6 +77,7 @@ public class MainApplicationFrame extends JFrame
         menuBar.add(createExitMenu());
         return menuBar;
     }
+    
     private JMenu createLookAndFeelMenu()
     {
         JMenu lookAndFeelMenu = new JMenu("Режим отображения");
@@ -127,9 +129,10 @@ public class MainApplicationFrame extends JFrame
         );
         
         if (result == JOptionPane.YES_OPTION) {
-            System.exit(0);
+            dispose();
         }
     }
+    
     private JMenu createExitMenu()
     {
         JMenu exitMenu = new JMenu("Приложение");
